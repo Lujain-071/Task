@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title> Specifed map </title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 90%;
+      margin: auto;
+    }
+
+    #map {
+      width: 90vw;
+      height: 90vh;
+      margin: 10px auto;
+    }
+
+    .btn-search {
+      padding: 0 15px;
+      display: inline-block;
+      color: #fff;
+      background: #03a9f4;
+      border: 3px solid #03a9f4;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div id="map"></div>
+
+    <form>
+      <input type="text" id="input-city-name">
+      <button type="button" class="btn-search">Search</button>
+    </form>
+  </div>
+
+
+  <script>
+    // my mapbox token 
+    mapboxgl.accessToken = 'pk.eyJ1IjoibHVqYWluMDcxIiwiYSI6ImNsY2Y5MzRhOTAyY2IzbnF1Z2kwZW8zMHkifQ.3MGPSFUfKjYIvEuqSRMklA';
+
+    const form = document.querySelector("form");
+    const inputCityName = document.querySelector("#input-city-name");
+    const btnSearch = document.querySelector(".btn-search");
+
+    // prevent the page from reloading when clicking enter in the input filed
+    form.addEventListener("submit", function (e) {
+      e.preventDefault()
+    })
+
+    btnSearch.addEventListener("click", function () {
+      const cityName = inputCityName.value;
+
+      // let url = 'https://api.api-ninjas.com/v1/geocoding?city=denver'
+      let url = 'https://api.api-ninjas.com/v1/geocoding?city=' + cityName;
+      let options = {
+        method: 'GET',
+        headers: { 'x-api-key': '7Y2IhtibTK5P8++yIvSUKQ==a2J1xWMAbWCNc3IY' }
+      }
+
+      fetch(url, options)
+        .then(res => res.json()) // parse response as JSON
+        .then(data => {
+          const city = data[0];
+          const longitude = city.longitude;
+          const latitude = city.latitude;
+          console.log("latitude = ", latitude)
+          console.log("longitude = ", longitude)
+
+          theMap(longitude, latitude);
+        })
+        .catch(err => {
+          alert("Please enter a valid city name!");
+        });
+    })
+
+    function theMap(longitude, latitude) {
+      let defaultCoordinates = [55.2924914, 25.2653471]; // Dubai is the default value
+
+      if (longitude && latitude) {
+        defaultCoordinates[0] = longitude;
+        defaultCoordinates[1] = latitude;
+      }
+
+      const map = new mapboxgl.Map({
+        container: 'map',
+
+        style: 'mapbox://styles/mapbox/streets-v11', // style URL
+        // center: [-74.5, 40], // starting position [lng, lat]
+        // center: [-0.1257, 51.5085], // starting position [lng, lat] => [-0.1257, 51.5085] (London)
+        center: defaultCoordinates, // starting position [lng, lat] => [-0.1257, 51.5085] (Dubai)
+        zoom: 9 // starting zoom
+      });
+    }
+    // show the map when open the page for the first time (Dubai) is the default value 
+    theMap()
+
+
+  </script>
+
+</body>
+
+</html>
